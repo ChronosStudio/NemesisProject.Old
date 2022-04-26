@@ -30,13 +30,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float cameraRotationLimit = 85f;
     private Rigidbody rb;
 
+    private InputManager inputManager;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         _collider = GetComponent<Collider>();
         characterController = GetComponent<CharacterController>();
-
     }
 
     private void Update()
@@ -57,14 +58,15 @@ public class PlayerController : MonoBehaviour
         //    return;
         //}
 
+
         if (Cursor.lockState != CursorLockMode.Locked)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         // Calculer la vélocité (vitesse) du mouvement de notre joueur
-        float xMov = Input.GetAxis("Horizontal");
-        float zMov = Input.GetAxis("Vertical");
+        float xMov = inputManager.Player.Move.ReadValue<Vector2>().x;
+        float zMov = inputManager.Player.Move.ReadValue<Vector2>().y;
         Vector3 moveHorizontal = transform.right * xMov;
         Vector3 moveVertical = transform.forward * zMov;
         Vector3 velocity = (moveHorizontal + moveVertical) * speed;
@@ -72,7 +74,7 @@ public class PlayerController : MonoBehaviour
         
         // Calcul de la force du jetpack / thruster
         Vector3 thrusterVelocity = Vector3.zero;
-        if (Input.GetButton("Jump") && thrusterFuelAmount > 0)
+        if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && thrusterFuelAmount > 0)
         {
             if (thrusterFuelAmount >= 0.01f)
             {
@@ -87,12 +89,12 @@ public class PlayerController : MonoBehaviour
         thrusterFuelAmount = Mathf.Clamp(thrusterFuelAmount, 0f, 1f);
 
         Move(velocity, thrusterVelocity);
-        print(thrusterFuelAmount);
+        print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
         // On calcule la rotation Y du joueur en un Vector3
-        float yRot = Input.GetAxisRaw("Mouse X");
+        float yRot = inputManager.Player.Rotation.ReadValue<Vector2>().x/20;
         Vector3 rotationY = new Vector3(0, yRot, 0) * mouseSensitivityX;
         // On calcule la rotation X du joueur en un Vector3
-        float xRot = Input.GetAxisRaw("Mouse Y");
+        float xRot = inputManager.Player.Rotation.ReadValue<Vector2>().y/20;
         float rotationX = xRot * mouseSensitivityY;
         Rotate(rotationY, rotationX);
 
@@ -102,13 +104,12 @@ public class PlayerController : MonoBehaviour
 
     private void Move(Vector3 velocity, Vector3 thrusterVelocity)
     {
-
         if (velocity != Vector3.zero)
         {
-            if (Input.GetButton("Sprint"))
+            if (inputManager.Player.Sprint.ReadValue<float>() == 1)
             {
                 animator.SetFloat("Speed", velocity.z * 4);
-                rb.MovePosition(rb.position + velocity * 3 * Time.fixedDeltaTime);
+                rb.MovePosition(rb.position + velocity * 2 * Time.fixedDeltaTime);
             }
             else
             {
@@ -117,15 +118,15 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (thrusterVelocity != Vector3.zero && !isGrounded)
+        if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && thrusterVelocity != Vector3.zero)
         {
             thrusterFuelAmount -= thrusterFuelBurnSpeed * Time.deltaTime;
-            rb.AddForce(thrusterVelocity * Time.fixedDeltaTime, ForceMode.Acceleration);
+            rb.AddForce(thrusterVelocity * Time.fixedDeltaTime, ForceMode.Force);
         }
-
-        if(Input.GetButtonDown("Jump") && isGrounded)
+       
+        if(inputManager.Player.Jump.ReadValue<float>() != 0 && isGrounded)
         {
-            rb.AddForce(Vector3.up *jumpIntensity, ForceMode.Impulse);
+            rb.velocity = Vector3.up*jumpIntensity;
         }
     }
 
@@ -146,4 +147,18 @@ public class PlayerController : MonoBehaviour
         distToGround = _collider.bounds.extents.y;
         isGrounded = Physics.Raycast(transform.position, -Vector3.up, (float)(distToGround + 0.1));
     }
+
+    private void Awake()
+    {
+        inputManager = new InputManager();
+    }
+    private void OnEnable()
+    {
+        inputManager.Player.Enable();
+    }
+    private void OnDisable()
+    {
+        inputManager.Player.Disable();
+    }
+
 }
