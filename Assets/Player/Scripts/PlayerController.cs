@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
@@ -18,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float thrusterFuelRegenSpeed = 0.3f;
     private float thrusterFuelAmount = 1f;
     CharacterController characterController;
+    private bool jetpack = false;
 
     public float GetThrusterFuelAmount()
     {
@@ -29,6 +32,7 @@ public class PlayerController : MonoBehaviour
     private float currentCameraRotationX = 0f;
     [SerializeField] private float cameraRotationLimit = 85f;
     private Rigidbody rb;
+  
 
     private InputManager inputManager;
 
@@ -42,6 +46,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+
         IsGrounded();
         //if(PauseMenu.isOn)
         //{
@@ -78,10 +83,10 @@ public class PlayerController : MonoBehaviour
         {
             if (thrusterFuelAmount >= 0.01f)
             {
-                thrusterVelocity = Vector3.up * thrusterForce / 3;
+                thrusterVelocity = Vector3.up * thrusterForce * 0.01f;
             }
         }
-        else
+        else if (isGrounded)
         {
             thrusterFuelAmount += thrusterFuelRegenSpeed * Time.deltaTime;
         }
@@ -90,9 +95,11 @@ public class PlayerController : MonoBehaviour
 
         Move(velocity, thrusterVelocity);
         print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
+
         // On calcule la rotation Y du joueur en un Vector3
         float yRot = inputManager.Player.Rotation.ReadValue<Vector2>().x/20;
         Vector3 rotationY = new Vector3(0, yRot, 0) * mouseSensitivityX;
+
         // On calcule la rotation X du joueur en un Vector3
         float xRot = inputManager.Player.Rotation.ReadValue<Vector2>().y/20;
         float rotationX = xRot * mouseSensitivityY;
@@ -106,11 +113,13 @@ public class PlayerController : MonoBehaviour
     {
         if (velocity != Vector3.zero)
         {
+            // Faire sprinter le joueur
             if (inputManager.Player.Sprint.ReadValue<float>() == 1)
             {
                 animator.SetFloat("Speed", velocity.z * 4);
                 rb.MovePosition(rb.position + velocity * 2 * Time.fixedDeltaTime);
             }
+            // Faire avancer le joueur
             else
             {
                 animator.SetFloat("Speed", velocity.z * 2);
@@ -118,15 +127,39 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // Calcul du fuel du jetpack
         if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && thrusterVelocity != Vector3.zero)
         {
+            rb.useGravity = false;
             thrusterFuelAmount -= thrusterFuelBurnSpeed * Time.deltaTime;
-            rb.AddForce(thrusterVelocity * Time.fixedDeltaTime, ForceMode.Force);
+            
+            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, 0, 9), rb.velocity.z);
+            if (rb.velocity.y > 8 || jetpack)
+            {
+                rb.velocity = Vector3.zero;
+                jetpack = true;
+            }
+            else if (rb.velocity.y < 8)
+            {
+                rb.velocity += thrusterVelocity;
+            }
+            print(rb.velocity);
+            print(jetpack);
         }
-       
+        else
+        {
+            rb.useGravity = true;
+        }
+        if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && jetpack) {
+            jetpack = true;
+        } 
+        else
+        {
+            jetpack = false;
+        }
         if(inputManager.Player.Jump.ReadValue<float>() != 0 && isGrounded)
         {
-            rb.velocity = Vector3.up*jumpIntensity;
+            //rb.velocity = Vector3.up * jumpIntensity;
         }
     }
 
@@ -141,6 +174,7 @@ public class PlayerController : MonoBehaviour
         cam.transform.localEulerAngles = new Vector3(currentCameraRotationX, 0f, 0f);
     }
 
+    // Vérifier si le personnage touche le sol
     private void IsGrounded()
     {
         float distToGround;
