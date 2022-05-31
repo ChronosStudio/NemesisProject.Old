@@ -1740,7 +1740,10 @@ GameObject:
   - component: {fileID: 3439619650427818920}
   - component: {fileID: 466531720709073109}
   - component: {fileID: 3740960092307982767}
-  m_Layer: 0
+  - component: {fileID: 6471496377141255475}
+  - component: {fileID: -6430790708539043992}
+  - component: {fileID: 4905815521484924403}
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1903,6 +1906,65 @@ MonoBehaviour:
   showGizmos: 0
   showOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+--- !u!114 &6471496377141255475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7212863707000887609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98272abe138c85a46add66cfeed8cf87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  weapon:
+    name: Submachine Gun
+    damage: 40
+    range: 100
+  cam: {fileID: 2051885831}
+  mask:
+    serializedVersion: 2
+    m_Bits: 567
+--- !u!114 &-6430790708539043992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7212863707000887609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1ffc099acf19674e9a971c5c39ae8e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  componentsToDisable:
+  - {fileID: 2051885831}
+  - {fileID: 584451932020916048}
+  - {fileID: 6471496377141255475}
+  remoteLayerName: remotePlayer
+--- !u!114 &4905815521484924403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7212863707000887609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa757f05ad51ea74e83ff6f341c81a26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  disableOnDeath:
+  - {fileID: 6471496377141255475}
+  - {fileID: 584451932020916048}
+  maxHealth: 100
 --- !u!1 &7401167338448178461
 GameObject:
   m_ObjectHideFlags: 0

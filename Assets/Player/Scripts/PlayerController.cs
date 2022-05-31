@@ -89,7 +89,7 @@ public class PlayerController : MonoBehaviour
         thrusterFuelAmount = Mathf.Clamp(thrusterFuelAmount, 0f, 1f);
 
         Move(velocity, thrusterVelocity);
-        print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
+        //print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
         // On calcule la rotation Y du joueur en un Vector3
         float yRot = inputManager.Player.Rotation.ReadValue<Vector2>().x/20;
         Vector3 rotationY = new Vector3(0, yRot, 0) * mouseSensitivityX;
