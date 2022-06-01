@@ -21,6 +21,11 @@ public class PlayerController : MonoBehaviour
     private float thrusterFuelAmount = 1f;
     CharacterController characterController;
     private bool jetpack = false;
+    [SerializeField] private float double_click_time = 0.2f;
+    private float lastPressTime;
+    private bool jetpackUsable;
+    private Vector3 jumpHeight;
+    private Vector3 jumpStartPos;
 
     public float GetThrusterFuelAmount()
     {
@@ -46,7 +51,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-
         IsGrounded();
         //if(PauseMenu.isOn)
         //{
@@ -85,6 +89,7 @@ public class PlayerController : MonoBehaviour
             {
                 thrusterVelocity = Vector3.up * thrusterForce * 0.01f;
             }
+            Jetpack(thrusterVelocity);
         }
         else if (isGrounded)
         {
@@ -94,7 +99,7 @@ public class PlayerController : MonoBehaviour
         thrusterFuelAmount = Mathf.Clamp(thrusterFuelAmount, 0f, 1f);
 
         Move(velocity, thrusterVelocity);
-        print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
+        //print("thrusterFuelAmount: "+thrusterFuelAmount*100+"%");
 
         // On calcule la rotation Y du joueur en un Vector3
         float yRot = inputManager.Player.Rotation.ReadValue<Vector2>().x/20;
@@ -127,42 +132,75 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Calcul du fuel du jetpack
-        if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && thrusterVelocity != Vector3.zero)
+
+        if (inputManager.Player.Jump.triggered)
         {
-            rb.useGravity = false;
+            if (!jetpackUsable)
+            {
+                jumpStartPos = rb.position;
+            }
+
+            float timeSinceLastPress = Time.time - lastPressTime;
+            if (timeSinceLastPress <= double_click_time)
+            {
+                jetpackUsable = true;
+                
+            }
+            else
+            {
+                jetpackUsable = false;
+                if (!isGrounded)
+                {
+                    rb.useGravity = true;
+                }
+                if (isGrounded && inputManager.Player.Jump.triggered)
+                {
+                    rb.useGravity = true;
+                    lastPressTime = Time.time;
+                    rb.velocity = Vector3.up * jumpIntensity;
+                }
+            }
+        }
+        if (!inputManager.Player.Jump.IsPressed()) 
+        {
+            rb.useGravity = true;
+            jetpack = false;
+            jetpackUsable = false;
+        }
+    }
+
+    private void Jetpack(Vector3 thrusterVelocity)
+    {
+        if (thrusterVelocity != Vector3.zero && thrusterFuelAmount > 0 && jetpackUsable)
+        {
             thrusterFuelAmount -= thrusterFuelBurnSpeed * Time.deltaTime;
-            
-            rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, 0, 9), rb.velocity.z);
-            if (rb.velocity.y > 8 || jetpack)
+
+            if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && thrusterFuelAmount >0)
             {
-                rb.velocity = Vector3.zero;
-                jetpack = true;
+                jumpHeight = rb.position - jumpStartPos;
+                rb.velocity = new Vector3(rb.velocity.x, Mathf.Clamp(rb.velocity.y, 0, 9), rb.velocity.z);
+                rb.useGravity = false;
+
+                if (jumpHeight.y > 3.5 || jetpack)
+                {
+                    rb.velocity = Vector3.zero;
+                    jetpack = true;
+                }
+                else if (jumpHeight.y < 3.5)
+                {
+                    rb.velocity += thrusterVelocity;
+                }
             }
-            else if (rb.velocity.y < 8)
-            {
-                rb.velocity += thrusterVelocity;
-            }
-            print(rb.velocity);
-            print(jetpack);
+
+
         }
         else
         {
             rb.useGravity = true;
+            
         }
-        if (inputManager.Player.Jetpack.ReadValue<float>() != 0 && jetpack) {
-            jetpack = true;
-        } 
-        else
-        {
-            jetpack = false;
-        }
-        if(inputManager.Player.Jump.ReadValue<float>() != 0 && isGrounded)
-        {
-            //rb.velocity = Vector3.up * jumpIntensity;
-        }
-    }
 
+    }
     private void Rotate(Vector3 RotationY, float RotationX)
     {
         // On calcule la rotation de la caméra
