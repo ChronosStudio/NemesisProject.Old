@@ -83,7 +83,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2051885828}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1 &32469634678092673
 GameObject:
   m_ObjectHideFlags: 0
@@ -1871,7 +1871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  jumpIntensity: 9
+  jumpIntensity: 11
   mouseSensitivityX: 3
   mouseSensitivityY: 3
   thrusterForce: 6
@@ -1943,8 +1943,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  clientAuthority: 0
-  sendInterval: 0.05
+  clientAuthority: 1
+  sendInterval: 0.01
   syncPosition: 1
   syncRotation: 1
   syncScale: 0
@@ -2003,6 +2003,7 @@ MonoBehaviour:
   - {fileID: 2051885831}
   - {fileID: 584451932020916048}
   - {fileID: 6471496377141255475}
+  - {fileID: 0}
   remoteLayerName: remotePlayer
 --- !u!114 &4905815521484924403
 MonoBehaviour:
