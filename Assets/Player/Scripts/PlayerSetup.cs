@@ -18,9 +18,11 @@ public class PlayerSetup : NetworkBehaviour
         {
             DisableComponent();
             AssignRemoteLayer();
+            
         }
         else
         {
+            DisableLayer();
             sceneCamera = Camera.main;
             if (sceneCamera != null)
             {
@@ -53,7 +55,15 @@ public class PlayerSetup : NetworkBehaviour
             componentsToDisable[i].enabled = false;
         }
     }
-
+    private void DisableLayer()
+    {
+         GameObject[] objects = GameObject.FindGameObjectsWithTag("LocalPlayer");
+        print(objects);
+        for (int i = 0; i < objects.Length; i++)
+        {
+            objects[i].SetActive(false);
+        }
+    }
     private void OnDisable()
     {
         if (sceneCamera != null)
