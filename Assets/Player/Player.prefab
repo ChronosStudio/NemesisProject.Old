@@ -1789,7 +1789,6 @@ GameObject:
   - component: {fileID: 8021735569659265923}
   - component: {fileID: 3922639553453865631}
   - component: {fileID: -4666607921530250206}
-  - component: {fileID: 7613235758906558905}
   - component: {fileID: 584451932020916048}
   - component: {fileID: 81188143809048078}
   - component: {fileID: 3439619650427818920}
@@ -1800,7 +1799,7 @@ GameObject:
   - component: {fileID: 4905815521484924403}
   m_Layer: 8
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1859,18 +1858,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &7613235758906558905
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7212863707000887609}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3c54000f576c0d4bb822d17feebd9a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &584451932020916048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1890,6 +1877,7 @@ MonoBehaviour:
   thrusterForce: 6
   thrusterFuelBurnSpeed: 0.5
   thrusterFuelRegenSpeed: 1
+  double_click_time: 0.2
   cam: {fileID: 2051885831}
   cameraRotationLimit: 85
 --- !u!136 &81188143809048078

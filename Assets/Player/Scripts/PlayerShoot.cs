@@ -4,6 +4,7 @@ using Mirror;
 public class PlayerShoot : NetworkBehaviour
 {
     public PlayerWeapons weapon;
+    private InputManager inputManager;
 
     [SerializeField]
     public Camera cam;
@@ -16,14 +17,14 @@ public class PlayerShoot : NetworkBehaviour
     {
         if (cam == null)
         {
-            Debug.LogError("Pas de camera renseigné sur le yteme de tir");
+            print("Pas de camera renseigné sur le yteme de tir");
             this.enabled = false;
         }
     }
 
     private void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (inputManager.Player.Fire.IsPressed())
         {
             Shoot();
         }
@@ -37,7 +38,7 @@ public class PlayerShoot : NetworkBehaviour
 
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, weapon.range, mask))
         {
-            if(hit.collider.tag == "player")
+            if (hit.collider.tag == "player")
             {
                 CmdPlayerShot(hit.collider.name, weapon.damage);
             }
@@ -47,9 +48,22 @@ public class PlayerShoot : NetworkBehaviour
     [Command]
     private void CmdPlayerShot(string playerId, float damage)
     {
-        Debug.Log(playerId + " a ete touché.");
+        print(playerId + " a ete touché.");
 
         Player player = GameManager.GetPlayer(playerId);
         player.RpcTakeDamage(damage);
+    }
+
+    private void Awake()
+    {
+        inputManager = new InputManager();
+    }
+    private void OnEnable()
+    {
+        inputManager.Player.Enable();
+    }
+    private void OnDisable()
+    {
+        inputManager.Player.Disable();
     }
 }

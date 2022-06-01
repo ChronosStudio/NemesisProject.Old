@@ -66,10 +66,10 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.K))
-        {
-            RpcTakeDamage(999);
-        }
+        //if(Input.GetKeyDown(KeyCode.K))
+        //{
+        //    RpcTakeDamage(999);
+        //}
        
     }
 
